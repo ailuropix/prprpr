@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdbool.h>
+#define MAX_SIZE 10 // Maximum size of the chessboard
+// Function prototypes
+void printSolution(int board[MAX_SIZE][MAX_SIZE], int N); // Print the chessboard configuration
+bool isSafe(int board[MAX_SIZE][MAX_SIZE], int row, int col, int N); // Check if a queen can be placed at a
+given position
+bool solveNQUtil(int board[MAX_SIZE][MAX_SIZE], int col, int N, int *solutionCount); // Utility function to
+solve N Queen problem
+bool solveNQ(int N); // Main function to solve N Queen problem
+
+// Print the chessboard configuration
+void printSolution(int board[MAX_SIZE][MAX_SIZE], int N) {
+for (int i = 0; i < N; i++) {
+for (int j = 0; j < N; j++) {
+if (board[i][j])
+printf("Q ");
+else
+printf(". ");
+}
+printf("\n");
+}
+printf("\n");
+}
+// Check if a queen can be placed at a given position
+bool isSafe(int board[MAX_SIZE][MAX_SIZE], int row, int col, int N) {
+int i, j;
+// Check this row on the left side
+for (i = 0; i < col; i++)
+if (board[row][i])
+return false;
+// Check upper diagonal on the left side
+for (i = row, j = col; i >= 0 && j >= 0; i--, j--)
+if (board[i][j])
+return false;
+// Check lower diagonal on the left side
+for (i = row, j = col; j >= 0 && i < N; i++, j--)
+if (board[i][j])
+return false;
+return true;
+}
+// Utility function to solve N Queen problem
+bool solveNQUtil(int board[MAX_SIZE][MAX_SIZE], int col, int N, int *solutionCount) {
+// Base case: If all queens are placed, return true
+if (col >= N) {
+(*solutionCount)++;
+if (*solutionCount > 2) // Exit after finding two solutions
+return true;
+printf("Solution %d:\n", *solutionCount);
+
+printSolution(board, N);
+return false; // Continue searching for more solutions
+}
+// Consider this column and try placing this queen in all rows one by one
+for (int i = 0; i < N; i++) {
+// Check if the queen can be placed on board[i][col]
+if (isSafe(board, i, col, N)) {
+// Place this queen in board[i][col]
+board[i][col] = 1;
+// Recur to place rest of the queens
+if (solveNQUtil(board, col + 1, N, solutionCount))
+return true;
+// If placing queen in board[i][col] doesn't lead to a solution, then remove queen from board[i][col]
+board[i][col] = 0; // BACKTRACK
+}
+}
+// If the queen cannot be placed in any row in this column col, then return false
+return false;
+}
+// Main function to solve N Queen problem
+bool solveNQ(int N) {
+int board[MAX_SIZE][MAX_SIZE];
+for (int i = 0; i < N; i++)
+for (int j = 0; j < N; j++)
+board[i][j] = 0; // Initialize board
+int solutionCount = 0;
+if (!solveNQUtil(board, 0, N, &solutionCount)) {
+printf("No solution exists for the given size.\n");
+return false;
+}
+return true;
+}
+// Driver program to test above function
+int main() {
+int N;
+printf("Enter the size of the chessboard: ");
+scanf("%d", &N);
+if (N <= 0 || N > MAX_SIZE) {
+printf("Invalid size! Please enter a size between 1 and %d.\n", MAX_SIZE);
+return 1;
+}
+
+solveNQ(N);
+return 0;
+}
