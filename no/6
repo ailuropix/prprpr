@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+int max(int a, int b);
+int lcs(char* X, char* Y, int i, int j, int** dp);
+int main() {
+char S1[100], S2[100];
+printf("Enter the first string: ");
+scanf("%s", S1);
+printf("Enter the second string: ");
+scanf("%s", S2);
+int m = strlen(S1);
+int n = strlen(S2);
+int i = 0, j = 0;
+// Dynamic programming table to store intermediate results
+int** dp = (int**)malloc((m + 1) * sizeof(int*));
+for (int k = 0; k <= m; ++k) {
+dp[k] = (int*)malloc((n + 1) * sizeof(int));
+}
+
+// Initialize the table with -1
+for (int x = 0; x <= m; ++x) {
+for (int y = 0; y <= n; ++y) {
+dp[x][y] = -1;
+}
+}
+// Function Call
+int lengthOfLCS = lcs(S1, S2, i, j, dp);
+// Print the length of LCS
+printf("Length of LCS is %d\n", lengthOfLCS);
+// Print the LCS
+printf("LCS is: ");
+int index = lengthOfLCS;
+char lcsString[index + 1];
+lcsString[index] = '\0';
+i = 0;
+j = 0;
+while (i < m && j < n) {
+if (S1[i] == S2[j]) {
+lcsString[lengthOfLCS - index] = S1[i];
+i++;
+j++;
+index--;
+} else if (dp[i + 1][j] > dp[i][j + 1]) {
+i++;
+} else {
+j++;
+}
+}
+printf("%s\n", lcsString);
+// Free the dynamically allocated memory
+for (int k = 0; k <= m; ++k) {
+free(dp[k]);
+}
+free(dp);
+return 0;
+}
+int lcs(char* X, char* Y, int i, int j, int** dp) {
+if (X[i] == '\0' || Y[j] == '\0') {
+
+return 0;
+}
+if (dp[i][j] != -1) {
+return dp[i][j];
+}
+if (X[i] == Y[j]) {
+return dp[i][j] = 1 + lcs(X, Y, i + 1, j + 1, dp);
+} else {
+return dp[i][j] = max(lcs(X, Y, i, j + 1, dp), lcs(X, Y, i + 1, j, dp));
+}
+}
+int max(int a, int b) {
+return (a > b) ? a : b;
+}
